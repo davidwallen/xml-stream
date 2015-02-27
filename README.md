@@ -135,3 +135,25 @@ myAsyncFunction( function() {
 ```
 Beware that resume() **must not** be called from within a handler callback.
 
+
+# Stop or abort parsing
+
+If you want parsing to stop (say your use case requires you to read the first three occurances of a tag), you can halt XML parsing by closing the underlying stream:
+```javascript
+    var XmlStream = require('xml-stream'),
+        fs = require('fs'),
+        stream = fs.createReadStream(pathToXMLFile),
+        xml = new XmlStream(stream),
+        count = 3;
+        
+    xml.on('endElement: SomeTag', function(someTag) {
+        var process = false;
+        if (someTag.id === "Foo") {
+            //process tag
+            count--;
+            if (count == 0) {
+                stream.close();
+            }
+        }
+    });
+```
